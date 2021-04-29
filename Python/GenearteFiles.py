@@ -4,6 +4,7 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import os
 
 
 class Files:
@@ -12,11 +13,11 @@ class Files:
     numFiles = 0
     allFiles = []
 
-    def __init__(self, numFiles, endLetter, rangeUpper, rangeLower):
+    def __init__(self, numFiles, endLetter, rangeUpper, rangeLower, useOld=False):
         self.endLetter = endLetter
         self.lettersArr = self.createLettersArr(endLetter)
         self.numFiles = numFiles
-        self.genrate_files(rangeUpper, rangeLower)
+        self.genrate_files(rangeUpper, rangeLower, useOld)
         self.TermDocFreq = self.getTermDocFreq()
 
     def statistical_model(self, query):
@@ -45,9 +46,11 @@ class Files:
     def vectorSpace_model(self, query):
         for f in files.allFiles:
             f.idfi = f.Contentmap
-            for j in f.TermFreq:
-                for i in self.TermDocFreq:
-                    f.idfi[i] = self.TermDocFreq[i] * j
+            for j, i in zip(f.TermFreq, self.TermDocFreq):
+                # for i in self.TermDocFreq:
+                f.idfi[i] = self.TermDocFreq[i] * j
+                # print(self.TermDocFreq[i], "*", j)
+                # !locigal error
         """Query"""
         temparr = {i: 0 for i in self.lettersArr}
         for i in query:
@@ -78,24 +81,36 @@ class Files:
             strcontent += random.choice(self.lettersArr) + " "
         return strcontent
 
-    def genrate_files(self, rangeUpper, rangeLower):
-        for f in range(self.numFiles):
-            fileID = "DOC_{}".format(f)
-            fileSize = random.randint(rangeUpper, rangeLower)
-            fileContent = self.genrateFilecontent(fileSize)
-            self.allFiles.append(
-                File(fileID, fileSize, fileContent, self.lettersArr))
+    def genrate_files(self, rangeUpper, rangeLower, useOld):
+        if useOld:
+            for fileID in os.listdir("DOCS"):
+                filename = os.path.join("DOCS", fileID)
+                f = open(filename, "r+")
+                fileContent = f.read()
+                fileSize = len(fileContent)//2
+                f.close()
+                # print(filename)
+                self.allFiles.append(
+                    File(fileID, fileSize, fileContent, self.lettersArr, useOld))
+        else:
+            for f in range(self.numFiles):
+                fileID = "DOC_{}".format(f)
+                fileSize = random.randint(rangeUpper, rangeLower)
+                fileContent = self.genrateFilecontent(fileSize)
+                self.allFiles.append(
+                    File(fileID, fileSize, fileContent, self.lettersArr, useOld))
 
 
 class File:
-    def __init__(self, fileID, fileSize, fileContent, lettersArr):
+    def __init__(self, fileID, fileSize, fileContent, lettersArr, useOld):
         self.fileID = fileID
         self.fileSize = fileSize
         self.fileContent = fileContent
         self.Contentmap = {i: 0 for i in lettersArr}
         self.ContentmapGen(fileContent)
         self.TermFreq = self.getFreq()
-        self.createFile()
+        if not useOld:
+            self.createFile()
 
     def createFile(self):
         f = open("DOCS/{}.txt".format(self.fileID), "w")
@@ -118,20 +133,28 @@ class File:
 
 
 """--------------------------------NEXT-FOR-TESTING-FOR-WEB------------------------------------"""
-files = Files(numFiles=3, endLetter='f', rangeUpper=5, rangeLower=10)
+files = Files(numFiles=3, endLetter='f', rangeUpper=5,
+              rangeLower=10, useOld=True)
 
 
 query = {'a': 0.2, 'b': 0.3}
-"""--------SEMI-DONE-AND-TESTED--------"""
+# TODO: Connect with frontend
+# ?-DONE-AND-TESTED-
 """--Statistical-Model--"""
 # files.statistical_model(query)
 # files.allFiles.sort(
 #     key=lambda File: File.statistical_model_score, reverse=True)
 # for f in files.allFiles:
 #     print(f.statistical_model_score, f.fileID)
+
 """--Vector-Space-Model--"""
 # files.vectorSpace_model(query)
+# # print(files.TermDocFreq)
 # files.allFiles.sort(
 #     key=lambda File: File.vectorSpace_model_score, reverse=True)
 # for f in files.allFiles:
 #     print(f.vectorSpace_model_score, f.fileID)
+
+# for f in files.allFiles:
+#     print(f.idfi)
+# print("->term doc fre", files.TermDocFreq)

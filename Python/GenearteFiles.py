@@ -27,8 +27,6 @@ class Files:
         for i in self.allFiles:
             i.statistical_model_score = np.dot(np.array(list(temparr.values())),
                                                np.array(i.TermFreq))
-            # print(np.dot(np.array(list(temparr.values())),
-            #          np.array(i.TermFreq)))
 
     def getTermDocFreq(self):
         """getTermDocFreq"""
@@ -46,11 +44,8 @@ class Files:
     def vectorSpace_model(self, query):
         for f in files.allFiles:
             f.idfi = f.Contentmap
-            for j, i in zip(f.TermFreq, self.TermDocFreq):
-                # for i in self.TermDocFreq:
+            for j, i in zip(f.TF, self.TermDocFreq):
                 f.idfi[i] = self.TermDocFreq[i] * j
-                # print(self.TermDocFreq[i], "*", j)
-                # !locigal error
         """Query"""
         temparr = {i: 0 for i in self.lettersArr}
         for i in query:
@@ -59,14 +54,6 @@ class Files:
         for f in files.allFiles:
             f.vectorSpace_model_score = (
                 np.dot(np.array(list(f.idfi.values())), np.array(list(temparr.values()))))
-            # print(np.array(list(f.idfi.values())))
-            # print(np.array(list(temparr.values())))
-            # print(np.array(list(self.TermDocFreq.values())))
-            # print(np.array(f.TermFreq))
-
-        # print("->", self.TermDocFreq)
-        # for i in files.allFiles:
-        #     print("-->>", i.TermFreq)
 
     def createLettersArr(self, letter):
         if(isinstance(letter, int)):
@@ -109,6 +96,7 @@ class File:
         self.Contentmap = {i: 0 for i in lettersArr}
         self.ContentmapGen(fileContent)
         self.TermFreq = self.getFreq()
+        self.TF = self.getTF()
         if not useOld:
             self.createFile()
 
@@ -128,8 +116,12 @@ class File:
     def getFreq(self):
         return [v / self.fileSize for v in self.Contentmap.values()]
 
+    def getTF(self):
+        maximum = max(self.Contentmap.values())
+        return [v / maximum for v in self.Contentmap.values()]
+
     def __str__(self):
-        return "FileID:" + str(self.fileID) + ",\t Size:"+str(self.fileSize)+"\n \t\tTermFreq:"+str(self.TermFreq)+"\n\t\tContentmap:"+str(self.Contentmap)
+        return "FileID:" + str(self.fileID) + ",\t Size:"+str(self.fileSize)+"\n \t\tTermFreq:"+str(self.TermFreq)+"\n \t\tVS_TF:"+str(self.TF)+"\n\t\tContentmap:"+str(self.Contentmap)
 
 
 """--------------------------------NEXT-FOR-TESTING-FOR-WEB------------------------------------"""
@@ -138,8 +130,9 @@ files = Files(numFiles=3, endLetter='f', rangeUpper=5,
 
 
 query = {'a': 0.2, 'b': 0.3}
+
 # TODO: Connect with frontend
-# ?-DONE-AND-TESTED-
+# ?-DONE-AND-TESTED
 """--Statistical-Model--"""
 # files.statistical_model(query)
 # files.allFiles.sort(

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        margin: 50px 0px;
+        padding: 0px;
+        text-align: center;
+      }
+
+      form {
+        display: inline-block;
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+
+  <body>
+    <form action="http://127.0.0.1:5000/search" method="POST">
+      <img src="{{ img }}" alt="IMG ALT" />
+      <br />
+      <input type="text" name="input_query" value="<a:0.2;b:0.3>" /> <br />
+      <br />
+      <input type="submit" value="Search" name="search" />
+      <input type="submit" value="Generate Files" name="generate" />
+      <!-- <input type="submit" value="Delete Files" name="delete"> -->
+    </form>
+    <br />
+  </body>
+</html>

@@ -41,13 +41,13 @@ class Files:
         return {key: math.log((self.numFiles/value), 2)
                 for (key, value) in sorted(df.items())}
 
-    def vectorSpace_model(self, query):
+    def vectorSpace_model(self, files, query):
         for f in files.allFiles:
             f.idfi = f.Contentmap
-            for j, i in zip(f.TF, self.TermDocFreq):
-                f.idfi[i] = self.TermDocFreq[i] * j
+            for j, i in zip(f.TF, files.TermDocFreq):
+                f.idfi[i] = files.TermDocFreq[i] * j
         """Query"""
-        temparr = {i: 0 for i in self.lettersArr}
+        temparr = {i: 0 for i in files.lettersArr}
         for i in query:
             temparr[i] = query[i]
 
@@ -69,6 +69,7 @@ class Files:
         return strcontent
 
     def genrate_files(self, rangeUpper, rangeLower, useOld):
+        self.allFiles = []
         if useOld:
             for fileID in os.listdir("DOCS"):
                 filename = os.path.join("DOCS", fileID)
@@ -124,9 +125,49 @@ class File:
         return "FileID:" + str(self.fileID) + ",\t Size:"+str(self.fileSize)+"\n \t\tTermFreq:"+str(self.TermFreq)+"\n \t\tVS_TF:"+str(self.TF)+"\n\t\tContentmap:"+str(self.Contentmap)
 
 
+def prepQuery(query):
+    query = query.replace("<", "", 1)
+    query = query.replace(">", "", 1)
+    query = query.split(";")
+    query = {i.split(":")[0]: float(i.split(":")[1]) for i in query}
+    return query
+
+
+def Search_Statistical(query):
+    query = prepQuery(query)
+    files = Files(numFiles=3, endLetter='f', rangeUpper=5,
+                  rangeLower=10, useOld=True)
+
+    files.statistical_model(query)
+    files.allFiles.sort(
+        key=lambda files: files.statistical_model_score, reverse=True)
+
+    out = "<h1>Statistical Model</h1><br>"
+    for f in files.allFiles:
+        out += "File: %s, Score: %s<br>" % (
+            f.fileID, f.statistical_model_score)
+    return out+"<br>"
+
+
+def Search_VectorSpace(query):
+    query = prepQuery(query)
+
+    filesV = Files(numFiles=3, endLetter='f', rangeUpper=5,
+                   rangeLower=10, useOld=True)
+    filesV.vectorSpace_model(files=filesV, query=query)
+    filesV.allFiles.sort(
+        key=lambda files: files.vectorSpace_model_score, reverse=True)
+
+    out = "<h1>Vector-Space Model</h1><br>"
+    for f in filesV.allFiles:
+        out += "File: %s, Score: %s<br>" % (
+            f.fileID, f.vectorSpace_model_score)
+    return out+"<br>"
+
+
 """--------------------------------NEXT-FOR-TESTING-FOR-WEB------------------------------------"""
-files = Files(numFiles=3, endLetter='f', rangeUpper=5,
-              rangeLower=10, useOld=True)
+# files = Files(numFiles=3, endLetter='f', rangeUpper=5,
+#               rangeLower=10, useOld=True)
 
 
 query = {'a': 0.2, 'b': 0.3}
@@ -140,8 +181,10 @@ query = {'a': 0.2, 'b': 0.3}
 # for f in files.allFiles:
 #     print(f.statistical_model_score, f.fileID)
 
-"""--Vector-Space-Model--"""
-# files.vectorSpace_model(query)
+# """--Vector-Space-Model--"""
+# files = Files(numFiles=3, endLetter='f', rangeUpper=5,
+#               rangeLower=10, useOld=True)
+# files.vectorSpace_model(files, query)
 # # print(files.TermDocFreq)
 # files.allFiles.sort(
 #     key=lambda File: File.vectorSpace_model_score, reverse=True)

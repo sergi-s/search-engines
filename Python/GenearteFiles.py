@@ -52,8 +52,15 @@ class Files:
             temparr[i] = query[i]
 
         for f in files.allFiles:
-            f.vectorSpace_model_score = (
+            fo2 = (
                 np.dot(np.array(list(f.idfi.values())), np.array(list(temparr.values()))))
+
+            idfiP2 = np.power(np.array(list(f.idfi.values())), 2)
+            tempP2 = np.power(np.array(list(temparr.values())), 2)
+
+            t7t = math.sqrt(sum(idfiP2)*sum(tempP2))
+
+            f.vectorSpace_model_score = (fo2/t7t) if (t7t > 0) else 0
 
     def createLettersArr(self, letter):
         if(isinstance(letter, int)):
@@ -133,10 +140,8 @@ def prepQuery(query):
     return query
 
 
-def Search_Statistical(query):
+def Search_Statistical(files, query):
     query = prepQuery(query)
-    files = Files(numFiles=3, endLetter='f', rangeUpper=5,
-                  rangeLower=10, useOld=True)
 
     files.statistical_model(query)
     files.allFiles.sort(
@@ -149,11 +154,9 @@ def Search_Statistical(query):
     return out+"<br>"
 
 
-def Search_VectorSpace(query):
+def Search_VectorSpace(filesV, query):
     query = prepQuery(query)
 
-    filesV = Files(numFiles=3, endLetter='f', rangeUpper=5,
-                   rangeLower=10, useOld=True)
     filesV.vectorSpace_model(files=filesV, query=query)
     filesV.allFiles.sort(
         key=lambda files: files.vectorSpace_model_score, reverse=True)
@@ -163,34 +166,3 @@ def Search_VectorSpace(query):
         out += "File: %s, Score: %s<br>" % (
             f.fileID, f.vectorSpace_model_score)
     return out+"<br>"
-
-
-"""--------------------------------NEXT-FOR-TESTING-FOR-WEB------------------------------------"""
-# files = Files(numFiles=3, endLetter='f', rangeUpper=5,
-#               rangeLower=10, useOld=True)
-
-
-query = {'a': 0.2, 'b': 0.3}
-
-# TODO: Connect with frontend
-# ?-DONE-AND-TESTED
-"""--Statistical-Model--"""
-# files.statistical_model(query)
-# files.allFiles.sort(
-#     key=lambda File: File.statistical_model_score, reverse=True)
-# for f in files.allFiles:
-#     print(f.statistical_model_score, f.fileID)
-
-# """--Vector-Space-Model--"""
-# files = Files(numFiles=3, endLetter='f', rangeUpper=5,
-#               rangeLower=10, useOld=True)
-# files.vectorSpace_model(files, query)
-# # print(files.TermDocFreq)
-# files.allFiles.sort(
-#     key=lambda File: File.vectorSpace_model_score, reverse=True)
-# for f in files.allFiles:
-#     print(f.vectorSpace_model_score, f.fileID)
-
-# for f in files.allFiles:
-#     print(f.idfi)
-# print("->term doc fre", files.TermDocFreq)

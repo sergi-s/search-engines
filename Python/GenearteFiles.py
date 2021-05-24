@@ -13,7 +13,8 @@ class Files:
     numFiles = 0
     allFiles = []
 
-    def __init__(self, numFiles, endLetter, rangeUpper, rangeLower, useOld=False):
+    def __init__(self, endLetter, rangeUpper, rangeLower, numFiles=len([name for name in os.listdir("DOCS") if os.path.isfile(os.path.join("DOCS", name))]), useOld=False):
+
         self.endLetter = endLetter
         self.lettersArr = self.createLettersArr(endLetter)
         self.numFiles = numFiles
@@ -81,8 +82,8 @@ class Files:
             for fileID in os.listdir("DOCS"):
                 filename = os.path.join("DOCS", fileID)
                 f = open(filename, "r+")
-                fileContent = f.read()
-                fileSize = len(fileContent)//2
+                fileContent = (f.read()).lower()
+                fileSize = (len(fileContent.strip())+1)//2
                 f.close()
                 # print(filename)
                 self.allFiles.append(
@@ -133,6 +134,7 @@ class File:
 
 
 def prepQuery(query):
+    query = query.lower()
     query = query.replace("<", "", 1)
     query = query.replace(">", "", 1)
     query = query.split(";")
@@ -166,3 +168,14 @@ def Search_VectorSpace(filesV, query):
         out += "File: %s, Score: %s<br>" % (
             f.fileID, f.vectorSpace_model_score)
     return out+"<br>"
+
+
+if __name__ == "__main__":
+    files = Files(numFiles=10, endLetter='f', rangeUpper=5,
+                  rangeLower=10, useOld=True)
+    # for f in files.allFiles:
+    #     print(f.TermFreq)
+    # print(Search_Statistical(files, "<A:0.3;B:0.6;c:0.8;f:0.1>"))
+    # for f in files.allFiles:
+    # print(files.TermDocFreq)
+    print(Search_VectorSpace(files, "<A:0.3;B:0.6;c:0.8;f:0.1>"))

@@ -13,7 +13,7 @@ def search():
     if request.method == "POST":
         if("search" in request.form.keys()):
             query = request.form['input_query']
-            files = GenearteFiles.Files(numFiles=3, endLetter='f', rangeUpper=5,
+            files = GenearteFiles.Files(endLetter='f', rangeUpper=5,
                                         rangeLower=10, useOld=True)
             if(request.form["models"] == "statistical"):
                 return GenearteFiles.Search_Statistical(files, query)
@@ -23,7 +23,7 @@ def search():
         elif("generate" in request.form.keys()):
             files = GenearteFiles.Files(numFiles=3, endLetter='f', rangeUpper=5,
                                         rangeLower=10, useOld=False)
-            return "HELLO generate"
+            return "File Generated"
 
 
 if __name__ == "__main__":

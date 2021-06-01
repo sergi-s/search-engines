@@ -133,17 +133,33 @@ class File:
         return "FileID:" + str(self.fileID) + ",\t Size:"+str(self.fileSize)+"\n \t\tTermFreq:"+str(self.TermFreq)+"\n \t\tVS_TF:"+str(self.TF)+"\n\t\tContentmap:"+str(self.Contentmap)
 
 
-def prepQuery(query):
+def prepQuery(files, query):
     query = query.lower()
-    query = query.replace("<", "", 1)
-    query = query.replace(">", "", 1)
-    query = query.split(";")
-    query = {i.split(":")[0]: float(i.split(":")[1]) for i in query}
-    return query
+    query = query.strip()
+    print('<' in query)
+    if '<' in query:
+        query = query.replace("<", "", 1)
+        query = query.replace(">", "", 1)
+        query = query.split(";")
+        query = {i.split(":")[0]: float(i.split(":")[1]) for i in query}
+        return query
+    else:
+        temp = { i:0 for i in files.TermDocFreq}
+        for i in temp:
+            temp[i]=0
+        for char in query:
+            temp[char]+=1
+        maxV = max(list(temp.values()))
+        for t in temp:
+            temp[t]/=maxV
+
+        for term in files.TermDocFreq:
+            temp[term] = temp[term]*files.TermDocFreq[term]
+        return temp
 
 
 def Search_Statistical(files, query):
-    query = prepQuery(query)
+    query = prepQuery(files, query)
 
     files.statistical_model(query)
     files.allFiles.sort(
@@ -157,7 +173,7 @@ def Search_Statistical(files, query):
 
 
 def Search_VectorSpace(filesV, query):
-    query = prepQuery(query)
+    query = prepQuery(filesV, query)
 
     filesV.vectorSpace_model(files=filesV, query=query)
     filesV.allFiles.sort(
@@ -178,4 +194,5 @@ if __name__ == "__main__":
     # print(Search_Statistical(files, "<A:0.3;B:0.6;c:0.8;f:0.1>"))
     # for f in files.allFiles:
     # print(files.TermDocFreq)
-    print(Search_VectorSpace(files, "<A:0.3;B:0.6;c:0.8;f:0.1>"))
+    # print(Search_VectorSpace(files, "<A:0.3;B:0.6;c:0.8;f:0.1>"))
+    print(Search_VectorSpace(files, "ACFBB"))

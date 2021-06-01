@@ -18,10 +18,15 @@ def search():
             if(request.form["models"] == "statistical"):
                 return GenearteFiles.Search_Statistical(files, query)
             elif(request.form["models"] == "vectorspace"):
-                return GenearteFiles.Search_VectorSpace(files, query)
+                result = GenearteFiles.Search_VectorSpace(files, query)
+                # print(files.TermDocFreq)
+                for i in files.allFiles:
+                    print(i.idfi)
+                print(files.TermDocFreq)
+                return result
 
         elif("generate" in request.form.keys()):
-            files = GenearteFiles.Files(numFiles=3, endLetter='f', rangeUpper=5,
+            files = GenearteFiles.Files(numFiles=10, endLetter='f', rangeUpper=5,
                                         rangeLower=10, useOld=False)
             return "File Generated"
 

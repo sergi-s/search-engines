@@ -107,8 +107,12 @@ def similarity(query, tfidf):
         tscore = 0
         for term in file:
             tscore += file[term]*query[term]
-        tscore = tscore/(cosine(list(file.values())) *
-                         cosine(list(query.values())))
+        t7t = (cosine(list(file.values())) *
+               cosine(list(query.values())))
+        if t7t > 0:
+            tscore = tscore/t7t
+        else:
+            tscore = 0
         scores.append(tscore)
     scores.sort(reverse=True)
     return scores

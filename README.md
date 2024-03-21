@@ -1,6 +1,6 @@
-# IR-Model
+# Search Engines
 
-IR-Model is a simple information retrieval system designed to mimic search engines. It generates several documents with random single-letter words, allowing users to enter queries and utilize the Statistical model and Vector space model to retrieve and rank the relevant documents.
+*Search Engines* are simple information retrieval systems designed to mimic search engines. It generates several documents with random single-letter words, allowing users to enter queries and utilize the Statistical model and Vector space model to retrieve and rank the relevant documents.
 
 ## Features
 
